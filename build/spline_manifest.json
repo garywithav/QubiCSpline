@@ -1,5 +1,5 @@
 {
-  "config_source": "qubitcfg.json",
+  "config_source": "C:\\Users\\garva\\Documents\\Research\\Siddiqui\\spline\\config\\qubitcfg.json",
   "delta": 0.001,
   "min_h_cycles": 4,
   "bram_depth": 4096,

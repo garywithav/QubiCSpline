@@ -15,7 +15,9 @@ Run:
 from pathlib import Path
 from cocotb_tools.runner import get_runner
 
-HERE = Path(__file__).parent
+HERE = Path(__file__).parent          # python/
+ROOT = HERE.parent                    # project root
+RTL  = ROOT / "rtl"
 
 
 def main():
@@ -23,8 +25,8 @@ def main():
 
     runner.build(
         verilog_sources=[
-            HERE / "spline_eval.sv",
-            HERE / "spline_eval_top.sv",
+            RTL / "spline_eval.sv",
+            RTL / "spline_eval_top.sv",
         ],
         hdl_toplevel="spline_eval_top",
         build_args=["-g2012"],
@@ -34,6 +36,7 @@ def main():
     runner.test(
         hdl_toplevel="spline_eval_top",
         test_module="test_spline_eval",
+        test_dir=HERE,                # cocotb needs to find test_spline_eval.py
     )
 
 

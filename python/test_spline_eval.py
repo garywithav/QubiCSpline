@@ -378,13 +378,17 @@ async def test_qubitcfg_pipeline(dut):
     import json as _json
     from pathlib import Path as _Path
 
-    manifest_path = _Path(__file__).parent / "spline_manifest.json"
+    _ROOT  = _Path(__file__).parent.parent    # python/ → project root
+    _BUILD = _ROOT / "build"
+    _CFG   = _ROOT / "config" / "qubitcfg.json"
+
+    manifest_path = _BUILD / "spline_manifest.json"
     if not manifest_path.exists():
-        # Try running the packer inline so the test is self-contained
+        # Self-contained fallback: run the packer if build/ isn't populated yet.
         from pack_qubitcfg import pack_qubitcfg as _pack
         _pack(
-            cfg_path=_Path(__file__).parent / "qubitcfg.json",
-            out_dir=_Path(__file__).parent,
+            cfg_path=_CFG,
+            out_dir=_BUILD,
             only_compression_wins=True,
             verbose=False,
         )
@@ -401,8 +405,8 @@ async def test_qubitcfg_pipeline(dut):
             out.append(int(line, 16))
         return out
 
-    coeff_image = _parse_mem(_Path(__file__).parent / "spline_coeff.mem")
-    width_image = _parse_mem(_Path(__file__).parent / "spline_width.mem")
+    coeff_image = _parse_mem(_BUILD / "spline_coeff.mem")
+    width_image = _parse_mem(_BUILD / "spline_width.mem")
 
     cocotb.start_soon(Clock(dut.clk, 1, units="ns").start())
     dut.reset.value      = 1

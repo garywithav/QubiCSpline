@@ -60,12 +60,9 @@ wire [SEG_ADDRW-1:0] width_addr;
 reg [127:0] coeff_data_r0 = 0, coeff_data_out = 0;
 reg [31:0]  width_data_r0 = 0, width_data_out = 0;
 
-initial begin
-    // Optional: load from .mem files if present. Cocotb can also poke
-    // coeff_bram[] / width_bram[] directly before driving cmdstb.
-    $readmemh("coeff_init.mem", coeff_bram);
-    $readmemh("width_init.mem", width_bram);
-end
+// Cocotb pokes coeff_bram[] / width_bram[] directly before driving cmdstb.
+// If you want to preload from .mem files, add a $readmemh here — but the
+// cocotb test doesn't need it.
 
 // Reset the output pipeline registers so a new gate doesn't see the
 // previous gate's last-segment data for the first 2 cycles after cmdstb

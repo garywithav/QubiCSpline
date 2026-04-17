@@ -1,3 +1,9 @@
-/.claude
-/.ipynb_checkpoints
-/__pycache__
+.claude/
+.ipynb_checkpoints/
+__pycache__/
+python/sim_build/
+python/*.npz
+python/results.xml
+*.vcd
+*.png
+build/*.b64

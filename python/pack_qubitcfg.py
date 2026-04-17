@@ -244,10 +244,16 @@ def pack_qubitcfg(
 
 # ─────────────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
+    HERE = Path(__file__).parent          # python/
+    ROOT = HERE.parent
+    DEFAULT_CFG = ROOT / "config" / "qubitcfg.json"
+    DEFAULT_OUT = ROOT / "build"
+
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("cfg", type=Path, help="path to qubitcfg.json")
-    ap.add_argument("-o", "--out", type=Path, default=Path("."),
-                    help="output directory (default: .)")
+    ap.add_argument("cfg", type=Path, nargs="?", default=DEFAULT_CFG,
+                    help=f"path to qubitcfg.json (default: {DEFAULT_CFG})")
+    ap.add_argument("-o", "--out", type=Path, default=DEFAULT_OUT,
+                    help=f"output directory (default: {DEFAULT_OUT})")
     ap.add_argument("--delta", type=float, default=1e-3,
                     help="relative tolerance (default: 1e-3)")
     ap.add_argument("--only-compression-wins", action="store_true",

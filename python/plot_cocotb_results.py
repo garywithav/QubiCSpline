@@ -20,12 +20,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path
 
-_here = Path(__file__).parent
-_sim  = _here / "sim_build"
+_here = Path(__file__).parent          # python/
+_root = _here.parent                   # project root
+_sim  = _here / "sim_build"            # cocotb puts .npz here
+_build = _root / "build"
 
 
 def _find(name):
-    for d in [_here, _sim]:
+    for d in [_sim, _build, _here, _root]:
         p = d / name
         if p.exists():
             return p
@@ -104,7 +106,7 @@ if rd is not None:
     ax.set_title('Zoom: Rising Cosine Edge'); ax.legend(fontsize=8)
 
     plt.tight_layout()
-    plt.savefig('cocotb_results_readout.png', dpi=150)
+    plt.savefig(_build / 'cocotb_results_readout.png', dpi=150)
     print(f"  -> cocotb_results_readout.png")
 else:
     print("READOUT: cocotb_results.npz not found, skipping.")
@@ -245,7 +247,7 @@ if dd is not None:
     ax.set_title('Error Distribution (I & Q)'); ax.legend(fontsize=8)
 
     plt.tight_layout()
-    plt.savefig('cocotb_results_drag.png', dpi=150)
+    plt.savefig(_build / 'cocotb_results_drag.png', dpi=150)
     print(f"  -> cocotb_results_drag.png")
 else:
     print("\nDRAG: cocotb_drag_results.npz not found, skipping.")
