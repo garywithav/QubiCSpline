@@ -67,11 +67,21 @@ initial begin
     $readmemh("width_init.mem", width_bram);
 end
 
+// Reset the output pipeline registers so a new gate doesn't see the
+// previous gate's last-segment data for the first 2 cycles after cmdstb
+// (the spline_eval FSM asserts `active` before BRAM latency drains).
 always @(posedge clk) begin
-    coeff_data_r0  <= coeff_bram[coeff_addr];
-    coeff_data_out <= coeff_data_r0;
-    width_data_r0  <= width_bram[width_addr];
-    width_data_out <= width_data_r0;
+    if (reset) begin
+        coeff_data_r0  <= 128'b0;
+        coeff_data_out <= 128'b0;
+        width_data_r0  <= 32'b0;
+        width_data_out <= 32'b0;
+    end else begin
+        coeff_data_r0  <= coeff_bram[coeff_addr];
+        coeff_data_out <= coeff_data_r0;
+        width_data_r0  <= width_bram[width_addr];
+        width_data_out <= width_data_r0;
+    end
 end
 
 // ── DUT ──────────────────────────────────────────────────────────────────────

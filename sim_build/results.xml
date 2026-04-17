@@ -1,11 +1,10 @@
 <testsuites name="results">
   <testsuite name="all" package="all">
-    <property name="random_seed" value="1776380144" />
-    <testcase name="test_reset_quiescent" classname="test_spline_eval" file="C:\Users\garva\Documents\Research\Siddiqui\spline\test_spline_eval.py" lineno="142" time="0.16715264320373535" sim_time_ns="60.0" ratio_time="358.9533425856061" />
-    <testcase name="test_full_pulse_matches_reference" classname="test_spline_eval" file="C:\Users\garva\Documents\Research\Siddiqui\spline\test_spline_eval.py" lineno="162" time="2.1400933265686035" sim_time_ns="2041.0000000000002" ratio_time="953.6967265219746" />
-    <testcase name="test_drag_pulse_matches_reference" classname="test_spline_eval" file="C:\Users\garva\Documents\Research\Siddiqui\spline\test_spline_eval.py" lineno="248" time="0.028255701065063477" sim_time_ns="0.0" ratio_time="0.0">
-      <failure error_type="ValueError" error_msg="24 segment(s) have h_cycles &lt; MIN_H_CYCLES=4 (worst: 1 cycles at segment 0). Refit with autoknots(min_dt=4/fs=4.000e-09) or lower MIN_H_CYCLES in spline_eval.sv." />
-    </testcase>
-    <testcase name="test_busy_deasserts_after_pulse" classname="test_spline_eval" file="C:\Users\garva\Documents\Research\Siddiqui\spline\test_spline_eval.py" lineno="325" time="3.216167449951172" sim_time_ns="2010.9999999999995" ratio_time="625.2783884217629" />
+    <property name="random_seed" value="1776384303" />
+    <testcase name="test_reset_quiescent" classname="test_spline_eval" file="C:\Users\garva\Documents\Research\Siddiqui\spline\test_spline_eval.py" lineno="146" time="0.03191351890563965" sim_time_ns="60.0" ratio_time="1880.0809831534123" />
+    <testcase name="test_full_pulse_matches_reference" classname="test_spline_eval" file="C:\Users\garva\Documents\Research\Siddiqui\spline\test_spline_eval.py" lineno="166" time="0.7177164554595947" sim_time_ns="2041.0000000000002" ratio_time="2843.741402993236" />
+    <testcase name="test_drag_pulse_matches_reference" classname="test_spline_eval" file="C:\Users\garva\Documents\Research\Siddiqui\spline\test_spline_eval.py" lineno="252" time="0.02772068977355957" sim_time_ns="73.0" ratio_time="2633.412104688266" />
+    <testcase name="test_busy_deasserts_after_pulse" classname="test_spline_eval" file="C:\Users\garva\Documents\Research\Siddiqui\spline\test_spline_eval.py" lineno="329" time="0.4734034538269043" sim_time_ns="2010.9999999999995" ratio_time="4247.96224814892" />
+    <testcase name="test_qubitcfg_pipeline" classname="test_spline_eval" file="C:\Users\garva\Documents\Research\Siddiqui\spline\test_spline_eval.py" lineno="375" time="1.7801058292388916" sim_time_ns="6250.000000000001" ratio_time="3511.0272082375423" />
   </testsuite>
 </testsuites>

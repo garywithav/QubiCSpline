@@ -260,21 +260,29 @@ wire [31:0] u_norm_wide = u_cnt * recip_h;
 wire signed [15:0] u_norm_q115 = $signed(u_norm_wide[15:0]);  // keep [0,1)
 
 always @(posedge clk) begin
-    // Latch coefficients from BRAM (coeff_data is valid here — READ_LATENCY=2 done)
-    s1_d_I  <= $signed(coeff_data[127:112]);
-    s1_c_I  <= $signed(coeff_data[111: 96]);
-    s1_b_I  <= $signed(coeff_data[ 95: 80]);
-    s1_a_I  <= $signed(coeff_data[ 79: 64]);
-    s1_d_Q  <= $signed(coeff_data[ 63: 48]);
-    s1_c_Q  <= $signed(coeff_data[ 47: 32]);
-    s1_b_Q  <= $signed(coeff_data[ 31: 16]);
-    s1_a_Q  <= $signed(coeff_data[ 15:  0]);
-    // First Horner multiply: p1 = d * u
-    s1_p1_I <= q115_mul($signed(coeff_data[127:112]), u_norm_q115);
-    s1_p1_Q <= q115_mul($signed(coeff_data[ 63: 48]), u_norm_q115);
-    // Freeze u for all downstream stages
-    s1_u    <= u_norm_q115;
-    s1_gate <= active;
+    if (reset) begin
+        s1_d_I <= '0; s1_c_I <= '0; s1_b_I <= '0; s1_a_I <= '0;
+        s1_d_Q <= '0; s1_c_Q <= '0; s1_b_Q <= '0; s1_a_Q <= '0;
+        s1_p1_I <= '0; s1_p1_Q <= '0;
+        s1_u <= '0;
+        s1_gate <= 1'b0;
+    end else begin
+        // Latch coefficients from BRAM (coeff_data is valid here — READ_LATENCY=2 done)
+        s1_d_I  <= $signed(coeff_data[127:112]);
+        s1_c_I  <= $signed(coeff_data[111: 96]);
+        s1_b_I  <= $signed(coeff_data[ 95: 80]);
+        s1_a_I  <= $signed(coeff_data[ 79: 64]);
+        s1_d_Q  <= $signed(coeff_data[ 63: 48]);
+        s1_c_Q  <= $signed(coeff_data[ 47: 32]);
+        s1_b_Q  <= $signed(coeff_data[ 31: 16]);
+        s1_a_Q  <= $signed(coeff_data[ 15:  0]);
+        // First Horner multiply: p1 = d * u
+        s1_p1_I <= q115_mul($signed(coeff_data[127:112]), u_norm_q115);
+        s1_p1_Q <= q115_mul($signed(coeff_data[ 63: 48]), u_norm_q115);
+        // Freeze u for all downstream stages
+        s1_u    <= u_norm_q115;
+        s1_gate <= active;
+    end
 end
 
 // Stage 2: p2 = (p1 + c) * u
@@ -285,14 +293,21 @@ reg signed [15:0] s2_u=0;
 reg               s2_gate=0;
 
 always @(posedge clk) begin
-    s2_p2_I <= q115_mul(s1_p1_I + s1_c_I, s1_u);
-    s2_p2_Q <= q115_mul(s1_p1_Q + s1_c_Q, s1_u);
-    s2_b_I  <= s1_b_I;
-    s2_b_Q  <= s1_b_Q;
-    s2_a_I  <= s1_a_I;
-    s2_a_Q  <= s1_a_Q;
-    s2_u    <= s1_u;     // propagate frozen u
-    s2_gate <= s1_gate;
+    if (reset) begin
+        s2_p2_I <= '0; s2_p2_Q <= '0;
+        s2_b_I <= '0; s2_b_Q <= '0; s2_a_I <= '0; s2_a_Q <= '0;
+        s2_u <= '0;
+        s2_gate <= 1'b0;
+    end else begin
+        s2_p2_I <= q115_mul(s1_p1_I + s1_c_I, s1_u);
+        s2_p2_Q <= q115_mul(s1_p1_Q + s1_c_Q, s1_u);
+        s2_b_I  <= s1_b_I;
+        s2_b_Q  <= s1_b_Q;
+        s2_a_I  <= s1_a_I;
+        s2_a_Q  <= s1_a_Q;
+        s2_u    <= s1_u;
+        s2_gate <= s1_gate;
+    end
 end
 
 // Stage 3: p3 = (p2 + b) * u
@@ -301,22 +316,48 @@ reg signed [15:0] s3_a_I=0,  s3_a_Q=0;
 reg               s3_gate=0;
 
 always @(posedge clk) begin
-    s3_p3_I <= q115_mul(s2_p2_I + s2_b_I, s2_u);
-    s3_p3_Q <= q115_mul(s2_p2_Q + s2_b_Q, s2_u);
-    s3_a_I  <= s2_a_I;
-    s3_a_Q  <= s2_a_Q;
-    s3_gate <= s2_gate;
+    if (reset) begin
+        s3_p3_I <= '0; s3_p3_Q <= '0;
+        s3_a_I <= '0; s3_a_Q <= '0;
+        s3_gate <= 1'b0;
+    end else begin
+        s3_p3_I <= q115_mul(s2_p2_I + s2_b_I, s2_u);
+        s3_p3_Q <= q115_mul(s2_p2_Q + s2_b_Q, s2_u);
+        s3_a_I  <= s2_a_I;
+        s3_a_Q  <= s2_a_Q;
+        s3_gate <= s2_gate;
+    end
 end
 
-// Stage 4: out = p3 + a
+// Stage 4: out = p3 + a, with saturation to Q1.15 range.
+//
+// Spline overshoot near the flat top of a clipped pulse (amp close to 1.0)
+// can push p3+a slightly above 1.0, which in 16-bit two's-complement wraps
+// to a large negative. Saturate to ±(2^15 - 1) instead so the DAC sees a
+// legal clipped value rather than a sign flip.
 reg [31:0] horner_out   = '0;
 reg        horner_valid = '0;
 
+wire signed [16:0] sum_I = $signed({s3_p3_I[15], s3_p3_I}) + $signed({s3_a_I[15], s3_a_I});
+wire signed [16:0] sum_Q = $signed({s3_p3_Q[15], s3_p3_Q}) + $signed({s3_a_Q[15], s3_a_Q});
+
+wire signed [15:0] sat_I = (sum_I > 17'sd32767)  ?  16'sd32767 :
+                           (sum_I < -17'sd32768) ? -16'sd32768 :
+                           sum_I[15:0];
+wire signed [15:0] sat_Q = (sum_Q > 17'sd32767)  ?  16'sd32767 :
+                           (sum_Q < -17'sd32768) ? -16'sd32768 :
+                           sum_Q[15:0];
+
 always @(posedge clk) begin
-    // Pack as {I[15:0], Q[15:0]} — matches envxy32x16 in ammod:
-    //   assign {envx[i],envy[i]} = envxy32x16[32*i+31:32*i+0]
-    horner_out   <= {(s3_p3_I + s3_a_I), (s3_p3_Q + s3_a_Q)};
-    horner_valid <= s3_gate;
+    if (reset) begin
+        horner_out   <= '0;
+        horner_valid <= 1'b0;
+    end else begin
+        // Pack as {I[15:0], Q[15:0]} — matches envxy32x16 in ammod:
+        //   assign {envx[i],envy[i]} = envxy32x16[32*i+31:32*i+0]
+        horner_out   <= {sat_I, sat_Q};
+        horner_valid <= s3_gate;
+    end
 end
 
 // ─────────────────────────────────────────────────────────────────────────────

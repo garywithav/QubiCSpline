@@ -99,8 +99,12 @@ def _ref_drag_pulse():
     fi = interp1d(t, I_sig, kind='linear')
     fq = interp1d(t, Q_sig, kind='linear')
 
-    # Use a uniform 25-knot grid (matches the union count from the notebook)
-    knots = np.linspace(0, twidth, 25)
+    # With 32 ns / 1 GSPS = 32 samples and MIN_H_CYCLES=4, the maximum number
+    # of knots is 32/4 + 1 = 9 (8 segments of 4 cycles each). This is the
+    # fundamental tradeoff the min_dt floor imposes on short pulses: the
+    # 14-bit time DAC cannot resolve finer spacing, so the spline has to
+    # compress harder. Use 9 knots uniformly spaced.
+    knots = np.linspace(0, twidth, 9)
     cs_I = CubicSpline(knots, fi(knots), bc_type='not-a-knot')
     cs_Q = CubicSpline(knots, fq(knots), bc_type='not-a-knot')
     return cs_I, cs_Q, t, I_sig, Q_sig
@@ -358,3 +362,161 @@ async def test_busy_deasserts_after_pulse(dut):
     assert int(dut.busy_out.value) == 0, (
         f"busy_out still high {total_cycles+2} cycles after cmdstb"
     )
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# End-to-end qubitcfg.json test
+#
+# Proves the full Python → BRAM → HW pipeline: pack_qubitcfg produces a BRAM
+# image + manifest, we load the image, then for each gate we fire cmdstb at
+# its manifest base address and verify output matches the gate's own reference.
+# ─────────────────────────────────────────────────────────────────────────────
+
+@cocotb.test()
+async def test_qubitcfg_pipeline(dut):
+    """Load packed qubitcfg BRAM image, fire several gates, verify outputs."""
+    import json as _json
+    from pathlib import Path as _Path
+
+    manifest_path = _Path(__file__).parent / "spline_manifest.json"
+    if not manifest_path.exists():
+        # Try running the packer inline so the test is self-contained
+        from pack_qubitcfg import pack_qubitcfg as _pack
+        _pack(
+            cfg_path=_Path(__file__).parent / "qubitcfg.json",
+            out_dir=_Path(__file__).parent,
+            only_compression_wins=True,
+            verbose=False,
+        )
+
+    manifest = _json.loads(manifest_path.read_text())
+
+    # Load the same BRAM image the FPGA would be programmed with
+    def _parse_mem(path):
+        out = []
+        for line in _Path(path).read_text().splitlines():
+            line = line.split("//")[0].strip()
+            if not line:
+                continue
+            out.append(int(line, 16))
+        return out
+
+    coeff_image = _parse_mem(_Path(__file__).parent / "spline_coeff.mem")
+    width_image = _parse_mem(_Path(__file__).parent / "spline_width.mem")
+
+    cocotb.start_soon(Clock(dut.clk, 1, units="ns").start())
+    dut.reset.value      = 1
+    dut.cmdstb.value     = 0
+    dut.coeff_base.value = 0
+    dut.n_segs.value     = 0
+    for _ in range(5):
+        await RisingEdge(dut.clk)
+
+    # Load the whole BRAM image
+    _load_bram(dut, coeff_image, width_image)
+    await RisingEdge(dut.clk)
+    dut.reset.value = 0
+    await RisingEdge(dut.clk)
+
+    # Pick a few interesting gates from the manifest — variety of env_funcs
+    # and avoid DRAG (its large min_dt errors aren't about HW correctness).
+    from spline_pulse_compiler import compile_pulse
+
+    # Pick gates where:
+    # (a) env_func is cos_edge_square or square (well-behaved shapes)
+    # (b) amp < 1.0 (avoids Q1.15 saturation artefacts that are orthogonal
+    #     to HW correctness — they're already flagged by the packer's
+    #     OVERFLOW messages). The assert tolerance is for pipeline math,
+    #     not clipping behavior.
+    picks = []
+    for label, info in manifest["gates"].items():
+        if info["env_func"] not in ("cos_edge_square", "square"):
+            continue
+        if info["n_segs"] < 5:
+            continue
+        if info["amp"] >= 1.0 - 1e-6:
+            continue
+        picks.append((label, info))
+        if len(picks) == 3:
+            break
+
+    assert picks, "no suitable gates in manifest for testing"
+    dut._log.info(f"Testing {len(picks)} gates from qubitcfg")
+
+    dac_lsb = 2.0 / 2**16
+    tol_lsb = 8   # allow some slack for the spline fit error reported in manifest
+
+    for label, info in picks:
+        # Reset between gates so the Horner pipeline doesn't contaminate
+        # the first few samples of a new fire with leftover pipeline state.
+        dut.reset.value = 1
+        for _ in range(40):
+            await RisingEdge(dut.clk)
+        dut.reset.value = 0
+
+        # Set coeff_base/n_segs BEFORE releasing reset-then-cmdstb, and allow
+        # several quiescent cycles so BRAM output registers settle to
+        # bram[base] before the pipeline starts consuming them.
+        dut.coeff_base.value = info["base"]
+        dut.n_segs.value     = info["n_segs"]
+        for _ in range(8):
+            await RisingEdge(dut.clk)
+
+        # Rebuild the expected HW output for this gate
+        cp = compile_pulse(
+            info["env_func"], info["paradict"],
+            info["twidth"], info["amp"],
+        )
+        I_ref, Q_ref, n_expected = _expected_from_words(cp)
+
+        # Fire at the manifest-declared base address
+        dut.cmdstb.value = 1
+        await RisingEdge(dut.clk)
+        dut.cmdstb.value = 0
+
+        # Capture
+        I_hw, Q_hw = [], []
+        for _ in range(n_expected + 200):
+            await RisingEdge(dut.clk)
+            if int(dut.valid_out.value) == 1:
+                raw = int(dut.envdata_out.value)
+                I_hw.append(_q115_to_float((raw >> 16) & 0xFFFF))
+                Q_hw.append(_q115_to_float(raw & 0xFFFF))
+            if len(I_hw) == n_expected:
+                break
+
+        assert len(I_hw) == n_expected, \
+            f"{label}: got {len(I_hw)} samples, expected {n_expected}"
+
+        I_hw = np.asarray(I_hw); Q_hw = np.asarray(Q_hw)
+        diff_I = np.abs(I_ref - I_hw)
+        err_I = np.max(diff_I)
+        err_Q = np.max(np.abs(Q_ref - Q_hw))
+        # Find the worst sample and log it — useful for diagnosing outliers
+        worst = int(np.argmax(diff_I))
+        dut._log.info(
+            f"  {label}: {n_expected} samples, "
+            f"err I={err_I/dac_lsb:.1f}L Q={err_Q/dac_lsb:.1f}L "
+            f"(worst @ idx {worst}: ref={I_ref[worst]:.4f} hw={I_hw[worst]:.4f})"
+        )
+        assert err_I < tol_lsb * dac_lsb, \
+            f"{label}: I error {err_I/dac_lsb:.1f} LSB exceeds {tol_lsb}"
+        assert err_Q < tol_lsb * dac_lsb, \
+            f"{label}: Q error {err_Q/dac_lsb:.1f} LSB exceeds {tol_lsb}"
+
+
+def _expected_from_words(cp):
+    """
+    Compute expected samples from the float splines in cp, then saturate to
+    Q1.15 range to model the hardware's output stage (see spline_eval.sv
+    saturation logic).
+    """
+    from scipy.interpolate import CubicSpline
+    from pulse_envelopes import make_envelope
+    I_func, Q_func = make_envelope(cp.env_func, cp.twidth, cp.amp, cp.paradict)
+    cs_I = CubicSpline(cp.knots, I_func(cp.knots), bc_type="not-a-knot")
+    cs_Q = CubicSpline(cp.knots, Q_func(cp.knots), bc_type="not-a-knot")
+    I_ref, Q_ref, n = _reference_samples(cs_I, cs_Q, cp.width_words)
+    q_max = 32767 / 32768
+    q_min = -1.0
+    return np.clip(I_ref, q_min, q_max), np.clip(Q_ref, q_min, q_max), n

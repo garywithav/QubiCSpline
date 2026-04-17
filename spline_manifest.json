@@ -1,0 +1,602 @@
+{
+  "config_source": "qubitcfg.json",
+  "delta": 0.001,
+  "min_h_cycles": 4,
+  "bram_depth": 4096,
+  "total_segments_used": 796,
+  "gates": {
+    "M0mark.p0.e0.mark": {
+      "base": 0,
+      "n_segs": 5,
+      "env_func": "mark",
+      "twidth": 1e-06,
+      "amp": 1.0,
+      "paradict": {},
+      "compression_ratio": 12.5,
+      "max_err_I_lsb": 1.0,
+      "max_err_Q_lsb": 0.0,
+      "converged": true
+    },
+    "alignmentread.p0.e0.square": {
+      "base": 5,
+      "n_segs": 5,
+      "env_func": "square",
+      "twidth": 1e-06,
+      "amp": 1.0,
+      "paradict": {
+        "phase": 0.0,
+        "amplitude": 1.0
+      },
+      "compression_ratio": 12.5,
+      "max_err_I_lsb": 1.0,
+      "max_err_Q_lsb": 0.0,
+      "converged": true
+    },
+    "alignmentread.p1.e0.square": {
+      "base": 10,
+      "n_segs": 5,
+      "env_func": "square",
+      "twidth": 1e-06,
+      "amp": 1.0,
+      "paradict": {
+        "phase": 0.0,
+        "amplitude": 1.0
+      },
+      "compression_ratio": 12.5,
+      "max_err_I_lsb": 1.0,
+      "max_err_Q_lsb": 0.0,
+      "converged": true
+    },
+    "vnaread.p0.e0.cos_edge_square": {
+      "base": 15,
+      "n_segs": 40,
+      "env_func": "cos_edge_square",
+      "twidth": 4e-06,
+      "amp": 1.0,
+      "paradict": {
+        "ramp_fraction": 0.25
+      },
+      "compression_ratio": 6.25,
+      "max_err_I_lsb": 11.129092574487004,
+      "max_err_Q_lsb": 0.0,
+      "converged": true
+    },
+    "vnaread.p1.e0.square": {
+      "base": 55,
+      "n_segs": 5,
+      "env_func": "square",
+      "twidth": 4e-06,
+      "amp": 1.0,
+      "paradict": {
+        "phase": 0.0,
+        "amplitude": 1.0
+      },
+      "compression_ratio": 50.0,
+      "max_err_I_lsb": 1.0,
+      "max_err_Q_lsb": 0.0,
+      "converged": true
+    },
+    "Q0rabi_ef.p0.e0.DRAG": {
+      "base": 60,
+      "n_segs": 24,
+      "env_func": "DRAG",
+      "twidth": 1e-06,
+      "amp": 0.95,
+      "paradict": {
+        "alpha": 1.5,
+        "sigmas": 3,
+        "delta": -268000000.0
+      },
+      "compression_ratio": 2.6041666666666665,
+      "max_err_I_lsb": 1.7349314176171902,
+      "max_err_Q_lsb": 1.019211614029146,
+      "converged": true
+    },
+    "Q0rabi.p0.e0.DRAG": {
+      "base": 84,
+      "n_segs": 24,
+      "env_func": "DRAG",
+      "twidth": 1e-06,
+      "amp": 0.12754785260396978,
+      "paradict": {
+        "alpha": 1.61,
+        "sigmas": 3,
+        "delta": -268000000.0
+      },
+      "compression_ratio": 2.6041666666666665,
+      "max_err_I_lsb": 1.1447418063793293,
+      "max_err_Q_lsb": 0.9850957574583088,
+      "converged": true
+    },
+    "Q0read.p0.e0.cos_edge_square": {
+      "base": 108,
+      "n_segs": 40,
+      "env_func": "cos_edge_square",
+      "twidth": 2e-06,
+      "amp": 0.24080761750950802,
+      "paradict": {
+        "ramp_fraction": 0.25
+      },
+      "compression_ratio": 3.125,
+      "max_err_I_lsb": 2.8641783448410933,
+      "max_err_Q_lsb": 0.0,
+      "converged": true
+    },
+    "Q0read.p1.e0.square": {
+      "base": 148,
+      "n_segs": 5,
+      "env_func": "square",
+      "twidth": 2e-06,
+      "amp": 1.0,
+      "paradict": {
+        "phase": 0.0,
+        "amplitude": 1.0
+      },
+      "compression_ratio": 25.0,
+      "max_err_I_lsb": 1.0,
+      "max_err_Q_lsb": 0.0,
+      "converged": true
+    },
+    "Q1rabi_ef.p0.e0.DRAG": {
+      "base": 153,
+      "n_segs": 24,
+      "env_func": "DRAG",
+      "twidth": 1e-06,
+      "amp": 0.95,
+      "paradict": {
+        "alpha": 1.0,
+        "sigmas": 3,
+        "delta": -268000000.0
+      },
+      "compression_ratio": 2.6041666666666665,
+      "max_err_I_lsb": 1.7349314176171902,
+      "max_err_Q_lsb": 1.470412741247351,
+      "converged": true
+    },
+    "Q1rabi.p0.e0.DRAG": {
+      "base": 177,
+      "n_segs": 24,
+      "env_func": "DRAG",
+      "twidth": 1e-06,
+      "amp": 0.18335773326808924,
+      "paradict": {
+        "alpha": -0.95,
+        "sigmas": 3,
+        "delta": -268000000.0
+      },
+      "compression_ratio": 2.6041666666666665,
+      "max_err_I_lsb": 1.5306072262928865,
+      "max_err_Q_lsb": 0.9982506783013851,
+      "converged": true
+    },
+    "Q1read.p0.e0.cos_edge_square": {
+      "base": 201,
+      "n_segs": 40,
+      "env_func": "cos_edge_square",
+      "twidth": 2e-06,
+      "amp": 0.45735624447968826,
+      "paradict": {
+        "ramp_fraction": 0.25
+      },
+      "compression_ratio": 3.125,
+      "max_err_I_lsb": 5.00852011711504,
+      "max_err_Q_lsb": 0.0,
+      "converged": true
+    },
+    "Q1read.p1.e0.square": {
+      "base": 241,
+      "n_segs": 5,
+      "env_func": "square",
+      "twidth": 2e-06,
+      "amp": 1.0,
+      "paradict": {
+        "phase": 0.0,
+        "amplitude": 1.0
+      },
+      "compression_ratio": 25.0,
+      "max_err_I_lsb": 1.0,
+      "max_err_Q_lsb": 0.0,
+      "converged": true
+    },
+    "Q2rabi_ef.p0.e0.DRAG": {
+      "base": 246,
+      "n_segs": 22,
+      "env_func": "DRAG",
+      "twidth": 1e-06,
+      "amp": 0.95,
+      "paradict": {
+        "alpha": 0.5,
+        "sigmas": 3,
+        "delta": -268000000.0
+      },
+      "compression_ratio": 2.840909090909091,
+      "max_err_I_lsb": 14.309992237314873,
+      "max_err_Q_lsb": 0.9918308452767716,
+      "converged": true
+    },
+    "Q2rabi.p0.e0.DRAG": {
+      "base": 268,
+      "n_segs": 24,
+      "env_func": "DRAG",
+      "twidth": 1e-06,
+      "amp": 0.20893547737701695,
+      "paradict": {
+        "alpha": 1.13,
+        "sigmas": 3,
+        "delta": -268000000.0
+      },
+      "compression_ratio": 2.6041666666666665,
+      "max_err_I_lsb": 1.2790017438698555,
+      "max_err_Q_lsb": 0.9186989971830988,
+      "converged": true
+    },
+    "Q2read.p0.e0.cos_edge_square": {
+      "base": 292,
+      "n_segs": 40,
+      "env_func": "cos_edge_square",
+      "twidth": 2e-06,
+      "amp": 0.6891441354895218,
+      "paradict": {
+        "ramp_fraction": 0.25
+      },
+      "compression_ratio": 3.125,
+      "max_err_I_lsb": 6.94796140264225,
+      "max_err_Q_lsb": 0.0,
+      "converged": true
+    },
+    "Q2read.p1.e0.square": {
+      "base": 332,
+      "n_segs": 5,
+      "env_func": "square",
+      "twidth": 2e-06,
+      "amp": 1.0,
+      "paradict": {
+        "phase": 0.0,
+        "amplitude": 1.0
+      },
+      "compression_ratio": 25.0,
+      "max_err_I_lsb": 1.0,
+      "max_err_Q_lsb": 0.0,
+      "converged": true
+    },
+    "Q3rabi_ef.p0.e0.DRAG": {
+      "base": 337,
+      "n_segs": 22,
+      "env_func": "DRAG",
+      "twidth": 1e-06,
+      "amp": 0.95,
+      "paradict": {
+        "alpha": 0.1,
+        "sigmas": 3,
+        "delta": -268000000.0
+      },
+      "compression_ratio": 2.840909090909091,
+      "max_err_I_lsb": 14.309992237314873,
+      "max_err_Q_lsb": 1.397450110186675,
+      "converged": true
+    },
+    "Q3rabi.p0.e0.DRAG": {
+      "base": 359,
+      "n_segs": 24,
+      "env_func": "DRAG",
+      "twidth": 1e-06,
+      "amp": 0.23633646119097138,
+      "paradict": {
+        "alpha": 1.0,
+        "sigmas": 3,
+        "delta": -268000000.0
+      },
+      "compression_ratio": 2.6041666666666665,
+      "max_err_I_lsb": 1.4849464441813325,
+      "max_err_Q_lsb": 0.9196304385309981,
+      "converged": true
+    },
+    "Q3read.p0.e0.cos_edge_square": {
+      "base": 383,
+      "n_segs": 40,
+      "env_func": "cos_edge_square",
+      "twidth": 2e-06,
+      "amp": 0.6184159547611449,
+      "paradict": {
+        "ramp_fraction": 0.25
+      },
+      "compression_ratio": 3.125,
+      "max_err_I_lsb": 6.411942571794498,
+      "max_err_Q_lsb": 0.0,
+      "converged": true
+    },
+    "Q3read.p1.e0.square": {
+      "base": 423,
+      "n_segs": 5,
+      "env_func": "square",
+      "twidth": 2e-06,
+      "amp": 1.0,
+      "paradict": {
+        "phase": 0.0,
+        "amplitude": 1.0
+      },
+      "compression_ratio": 25.0,
+      "max_err_I_lsb": 1.0,
+      "max_err_Q_lsb": 0.0,
+      "converged": true
+    },
+    "Q4rabi_ef.p0.e0.DRAG": {
+      "base": 428,
+      "n_segs": 24,
+      "env_func": "DRAG",
+      "twidth": 1e-06,
+      "amp": 0.95,
+      "paradict": {
+        "alpha": 2.0,
+        "sigmas": 3,
+        "delta": -268000000.0
+      },
+      "compression_ratio": 2.6041666666666665,
+      "max_err_I_lsb": 1.7349314176171902,
+      "max_err_Q_lsb": 1.1074862173365432,
+      "converged": true
+    },
+    "Q4rabi.p0.e0.DRAG": {
+      "base": 452,
+      "n_segs": 24,
+      "env_func": "DRAG",
+      "twidth": 1e-06,
+      "amp": 0.3109459571951109,
+      "paradict": {
+        "alpha": 1.0,
+        "sigmas": 3,
+        "delta": -268000000.0
+      },
+      "compression_ratio": 2.6041666666666665,
+      "max_err_I_lsb": 0.9045048265306832,
+      "max_err_Q_lsb": 0.8001688289124829,
+      "converged": true
+    },
+    "Q4read.p0.e0.cos_edge_square": {
+      "base": 476,
+      "n_segs": 40,
+      "env_func": "cos_edge_square",
+      "twidth": 2e-06,
+      "amp": 0.6009736013049786,
+      "paradict": {
+        "ramp_fraction": 0.25
+      },
+      "compression_ratio": 3.125,
+      "max_err_I_lsb": 6.643411465374811,
+      "max_err_Q_lsb": 0.0,
+      "converged": true
+    },
+    "Q4read.p1.e0.square": {
+      "base": 516,
+      "n_segs": 5,
+      "env_func": "square",
+      "twidth": 2e-06,
+      "amp": 1.0,
+      "paradict": {
+        "phase": 0.0,
+        "amplitude": 1.0
+      },
+      "compression_ratio": 25.0,
+      "max_err_I_lsb": 1.0,
+      "max_err_Q_lsb": 0.0,
+      "converged": true
+    },
+    "Q5rabi_ef.p0.e0.DRAG": {
+      "base": 521,
+      "n_segs": 24,
+      "env_func": "DRAG",
+      "twidth": 1e-06,
+      "amp": 0.95,
+      "paradict": {
+        "alpha": 1.4,
+        "sigmas": 3,
+        "delta": -268000000.0
+      },
+      "compression_ratio": 2.6041666666666665,
+      "max_err_I_lsb": 1.7349314176171902,
+      "max_err_Q_lsb": 1.2817051240895267,
+      "converged": true
+    },
+    "Q5rabi.p0.e0.DRAG": {
+      "base": 545,
+      "n_segs": 24,
+      "env_func": "DRAG",
+      "twidth": 1e-06,
+      "amp": 0.39180973643874956,
+      "paradict": {
+        "alpha": -0.83,
+        "sigmas": 3,
+        "delta": -268000000.0
+      },
+      "compression_ratio": 2.6041666666666665,
+      "max_err_I_lsb": 1.1826321157259372,
+      "max_err_Q_lsb": 1.5216626070810992,
+      "converged": true
+    },
+    "Q5read.p0.e0.cos_edge_square": {
+      "base": 569,
+      "n_segs": 40,
+      "env_func": "cos_edge_square",
+      "twidth": 2e-06,
+      "amp": 0.6393377601319509,
+      "paradict": {
+        "ramp_fraction": 0.25
+      },
+      "compression_ratio": 3.125,
+      "max_err_I_lsb": 6.709588834321039,
+      "max_err_Q_lsb": 0.0,
+      "converged": true
+    },
+    "Q5read.p1.e0.square": {
+      "base": 609,
+      "n_segs": 5,
+      "env_func": "square",
+      "twidth": 2e-06,
+      "amp": 1.0,
+      "paradict": {
+        "phase": 0.0,
+        "amplitude": 1.0
+      },
+      "compression_ratio": 25.0,
+      "max_err_I_lsb": 1.0,
+      "max_err_Q_lsb": 0.0,
+      "converged": true
+    },
+    "Q6rabi_ef.p0.e0.DRAG": {
+      "base": 614,
+      "n_segs": 22,
+      "env_func": "DRAG",
+      "twidth": 1e-06,
+      "amp": 0.95,
+      "paradict": {
+        "alpha": 0.48,
+        "sigmas": 3,
+        "delta": -268000000.0
+      },
+      "compression_ratio": 2.840909090909091,
+      "max_err_I_lsb": 14.309992237314873,
+      "max_err_Q_lsb": 1.0662627352294685,
+      "converged": true
+    },
+    "Q6rabi.p0.e0.DRAG": {
+      "base": 636,
+      "n_segs": 22,
+      "env_func": "DRAG",
+      "twidth": 1e-06,
+      "amp": 0.2732079653397752,
+      "paradict": {
+        "alpha": 0.79,
+        "sigmas": 3,
+        "delta": -268000000.0
+      },
+      "compression_ratio": 2.840909090909091,
+      "max_err_I_lsb": 4.541577256261007,
+      "max_err_Q_lsb": 0.9928219406045625,
+      "converged": true
+    },
+    "Q6read.p0.e0.cos_edge_square": {
+      "base": 658,
+      "n_segs": 40,
+      "env_func": "cos_edge_square",
+      "twidth": 2e-06,
+      "amp": 0.45183534670078374,
+      "paradict": {
+        "ramp_fraction": 0.25
+      },
+      "compression_ratio": 3.125,
+      "max_err_I_lsb": 4.9145067365825525,
+      "max_err_Q_lsb": 0.0,
+      "converged": true
+    },
+    "Q6read.p1.e0.square": {
+      "base": 698,
+      "n_segs": 5,
+      "env_func": "square",
+      "twidth": 2e-06,
+      "amp": 1.0,
+      "paradict": {
+        "phase": 0.0,
+        "amplitude": 1.0
+      },
+      "compression_ratio": 25.0,
+      "max_err_I_lsb": 1.0,
+      "max_err_Q_lsb": 0.0,
+      "converged": true
+    },
+    "Q7rabi_ef.p0.e0.DRAG": {
+      "base": 703,
+      "n_segs": 24,
+      "env_func": "DRAG",
+      "twidth": 1e-06,
+      "amp": 0.95,
+      "paradict": {
+        "alpha": 2.6,
+        "sigmas": 3,
+        "delta": -268000000.0
+      },
+      "compression_ratio": 2.6041666666666665,
+      "max_err_I_lsb": 1.7349314176171902,
+      "max_err_Q_lsb": 1.1091074647120536,
+      "converged": true
+    },
+    "Q7rabi.p0.e0.DRAG": {
+      "base": 727,
+      "n_segs": 24,
+      "env_func": "DRAG",
+      "twidth": 1e-06,
+      "amp": 0.12158544646008652,
+      "paradict": {
+        "alpha": 1.0,
+        "sigmas": 3,
+        "delta": -268000000.0
+      },
+      "compression_ratio": 2.6041666666666665,
+      "max_err_I_lsb": 0.894774594496397,
+      "max_err_Q_lsb": 0.9913147501485279,
+      "converged": true
+    },
+    "Q7read.p0.e0.cos_edge_square": {
+      "base": 751,
+      "n_segs": 40,
+      "env_func": "cos_edge_square",
+      "twidth": 2e-06,
+      "amp": 0.9246698749562958,
+      "paradict": {
+        "ramp_fraction": 0.25
+      },
+      "compression_ratio": 3.125,
+      "max_err_I_lsb": 10.038191158273548,
+      "max_err_Q_lsb": 0.0,
+      "converged": true
+    },
+    "Q7read.p1.e0.square": {
+      "base": 791,
+      "n_segs": 5,
+      "env_func": "square",
+      "twidth": 2e-06,
+      "amp": 1.0,
+      "paradict": {
+        "phase": 0.0,
+        "amplitude": 1.0
+      },
+      "compression_ratio": 25.0,
+      "max_err_I_lsb": 1.0,
+      "max_err_Q_lsb": 0.0,
+      "converged": true
+    }
+  },
+  "skipped": [
+    {
+      "label": "Q0X90.p0.e0.DRAG",
+      "compression": 0.25
+    },
+    {
+      "label": "Q1X90.p0.e0.DRAG",
+      "compression": 0.25
+    },
+    {
+      "label": "Q2X90.p0.e0.DRAG",
+      "compression": 0.25
+    },
+    {
+      "label": "Q3X90.p0.e0.DRAG",
+      "compression": 0.25
+    },
+    {
+      "label": "Q4X90.p0.e0.DRAG",
+      "compression": 0.25
+    },
+    {
+      "label": "Q5X90.p0.e0.DRAG",
+      "compression": 0.25
+    },
+    {
+      "label": "Q6X90.p0.e0.DRAG",
+      "compression": 0.25
+    },
+    {
+      "label": "Q7X90.p0.e0.DRAG",
+      "compression": 0.25
+    }
+  ]
+}
