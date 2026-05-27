@@ -61,6 +61,18 @@ BRAM_DEPTH = 4096
 # margin. Corresponding minimum time spacing is MIN_H_CYCLES / FS seconds.
 MIN_H_CYCLES = 4
 
+# Maximum allowed segment width in clock cycles. This is a packing
+# constraint: the width BRAM stores h_cycles in the lower 16 bits of a
+# 32-bit word, so the field can represent at most 2^16 - 1 = 65535
+# cycles (= 65.5 µs at 1 GSPS). NOT a physical hardware-resolution
+# limit — purely an artifact of the chosen BRAM layout. Could be lifted
+# by widening h_cycles in spline_eval.sv + reformatting the width word;
+# tracked as a future RTL change.
+#
+# autoknots(max_dt=...) enforces this on the algorithm side so the
+# packer never produces a segment that wouldn't fit.
+MAX_H_CYCLES = 65535
+
 
 def to_q115(x: float, label: str = "") -> int:
     v = round(x * Q_SCALE)
@@ -118,6 +130,57 @@ def pack_coefficients(
             f"Refit with autoknots(min_dt={min_h_cycles}/fs={min_h_cycles/fs:.3e}) "
             f"or lower MIN_H_CYCLES in spline_eval.sv."
         )
+
+    # Enforce maximum segment width — the 16-bit h_cycles field in the
+    # width BRAM word can't represent values >= 2^16. This is a packing
+    # constraint, not a physical limit (see MAX_H_CYCLES comment). The
+    # algorithm SHOULD have prevented this via max_dt in autoknots; we
+    # check here as defense-in-depth so an upstream bug causes a clear
+    # raise rather than silent BRAM wrap → corrupt HW output.
+    wide = np.where(h_cycles_all > MAX_H_CYCLES)[0]
+    if len(wide):
+        worst = int(h_cycles_all[wide].max())
+        raise ValueError(
+            f"{len(wide)} segment(s) have h_cycles > MAX_H_CYCLES={MAX_H_CYCLES} "
+            f"(worst: {worst} cycles at segment {int(wide[0])}). "
+            f"This should have been prevented by autoknots(max_dt=...); "
+            f"call compile_pulse so max_dt is set, or pass "
+            f"max_dt={MAX_H_CYCLES}/fs={MAX_H_CYCLES/fs:.3e} when invoking "
+            f"autoknots directly."
+        )
+
+    # Explicit Q1.15 overflow check on the d coefficient. The d term is
+    # scaled by h_s³ in pack_coefficients (see below), so for long pulses
+    # with wide segments d_hw = d * h_s³ can exceed the Q1.15 range ±1.0
+    # even when the underlying signal is bounded. Catch this BEFORE
+    # to_q115() silently clips — for transport-class shapes (atom_transport,
+    # adiabatic_ramp at large twidth) this is a real failure mode, not a
+    # spurious clip warning.
+    h_s_all = np.diff(knots).astype(float)
+    d_I_hw = cs_I.c[0] * h_s_all ** 3   # shape (n_segs,)
+    d_Q_hw = cs_Q.c[0] * h_s_all ** 3
+    Q115_RANGE = Q_MAX / Q_SCALE        # 0.999969... — actual representable max
+    overflowing = []
+    for i in range(n_segs):
+        for ch_name, d_val in (("d_I", d_I_hw[i]), ("d_Q", d_Q_hw[i])):
+            if abs(d_val) > Q115_RANGE:
+                overflowing.append((i, ch_name, float(d_val), float(h_s_all[i])))
+    if overflowing:
+        msg = [
+            "Q1.15 overflow on d coefficient(s) at pack time. The d term "
+            "is scaled by h_s³ and saturates for wide-segment / steep-"
+            "cubic combinations. Tighten delta (more knots → narrower h_s) "
+            "or reduce amp.",
+            "",
+            f"  {'seg':>4} {'channel':>8} {'h_s (ns)':>10} {'d * h_s³':>12} "
+            f"{'limit':>10}",
+        ]
+        for seg, ch_name, d_val, h_s in overflowing:
+            msg.append(
+                f"  {seg:>4} {ch_name:>8} {h_s*1e9:>10.1f} {d_val:>+12.4f} "
+                f"{Q115_RANGE:>+10.4f}"
+            )
+        raise ValueError("\n".join(msg))
 
     if verbose:
         print(f"Packing {n_segs} segments | Q1.15 | fs={fs/1e9:.1f} GSPS")

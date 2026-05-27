@@ -7,3 +7,7 @@ python/results.xml
 *.vcd
 *.png
 build/*.b64
+docs/*.aux
+docs/*.log
+docs/*.out
+docs/*.toc

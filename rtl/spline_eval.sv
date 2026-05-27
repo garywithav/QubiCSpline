@@ -247,9 +247,11 @@ endfunction
 // Stage 4 (cycle 7):             out = p3 + a
 // ─────────────────────────────────────────────────────────────────────────────
 
-// Stage 1 inputs — latched coefficients and u_norm
-reg signed [15:0] s1_d_I=0, s1_c_I=0, s1_b_I=0, s1_a_I=0;
-reg signed [15:0] s1_d_Q=0, s1_c_Q=0, s1_b_Q=0, s1_a_Q=0;
+// Stage 1 inputs — latched coefficients and u_norm.
+// Stage 1 consumes d immediately in p1 = d*u. No latch needed for d,
+// unlike a/b/c which must survive until subsequent Horner stages.
+reg signed [15:0] s1_c_I=0, s1_b_I=0, s1_a_I=0;
+reg signed [15:0] s1_c_Q=0, s1_b_Q=0, s1_a_Q=0;
 reg signed [15:0] s1_p1_I=0, s1_p1_Q=0;
 reg signed [15:0] s1_u=0;      // u_norm, frozen here and propagated
 reg               s1_gate=0;
@@ -261,18 +263,18 @@ wire signed [15:0] u_norm_q115 = $signed(u_norm_wide[15:0]);  // keep [0,1)
 
 always @(posedge clk) begin
     if (reset) begin
-        s1_d_I <= '0; s1_c_I <= '0; s1_b_I <= '0; s1_a_I <= '0;
-        s1_d_Q <= '0; s1_c_Q <= '0; s1_b_Q <= '0; s1_a_Q <= '0;
+        s1_c_I <= '0; s1_b_I <= '0; s1_a_I <= '0;
+        s1_c_Q <= '0; s1_b_Q <= '0; s1_a_Q <= '0;
         s1_p1_I <= '0; s1_p1_Q <= '0;
         s1_u <= '0;
         s1_gate <= 1'b0;
     end else begin
-        // Latch coefficients from BRAM (coeff_data is valid here — READ_LATENCY=2 done)
-        s1_d_I  <= $signed(coeff_data[127:112]);
+        // Latch coefficients from BRAM (coeff_data is valid here — READ_LATENCY=2 done).
+        // d is intentionally NOT latched: it feeds p1 = d*u in this same stage and
+        // is never referenced again (Horner only needs a/b/c after stage 1).
         s1_c_I  <= $signed(coeff_data[111: 96]);
         s1_b_I  <= $signed(coeff_data[ 95: 80]);
         s1_a_I  <= $signed(coeff_data[ 79: 64]);
-        s1_d_Q  <= $signed(coeff_data[ 63: 48]);
         s1_c_Q  <= $signed(coeff_data[ 47: 32]);
         s1_b_Q  <= $signed(coeff_data[ 31: 16]);
         s1_a_Q  <= $signed(coeff_data[ 15:  0]);

@@ -43,7 +43,10 @@ from spline_pulse_compiler import compile_pulse, verify_pulse, CompiledPulse
 from spline_coeff_pack import BRAM_DEPTH, MIN_H_CYCLES
 
 
-SUPPORTED_ENV_FUNCS = {"DRAG", "cos_edge_square", "square", "mark"}
+SUPPORTED_ENV_FUNCS = {
+    "DRAG", "cos_edge_square", "square", "mark",
+    "adiabatic_ramp", "rydberg_drag", "atom_transport",
+}
 
 
 # ─────────────────────────────────────────────────────────────────────────────
