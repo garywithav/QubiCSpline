@@ -19,7 +19,7 @@
 //   Total: 30 + 2 + 3 = 35 cycles from cmdstb
 //
 // spline_eval produces envdata_out with identical 35-cycle latency
-// (7-cycle Horner pipeline + reg_delay1 OUT_DELAY=28).
+// (8-cycle Horner pipeline + reg_delay1 OUT_DELAY=27).
 // Replace the BRAM + pipeline with a single spline_eval instantiation.
 //
 // ─────────────────────────────────────────────────────────────────────────────
@@ -62,15 +62,17 @@
 //   [15: 0] = h_cycles      (segment width in clock cycles, integer)
 //
 // ─────────────────────────────────────────────────────────────────────────────
-// PIPELINE LATENCY: 7 cycles from cmdstb to Horner output
+// PIPELINE LATENCY: 8 cycles from cmdstb to Horner output
 //   Cycle 1: segment controller registers cmdstb, issues BRAM addresses
 //   Cycle 2: BRAM read stage 1 (READ_LATENCY=2)
 //   Cycle 3: BRAM read stage 2 — coeff_data and width_data valid
-//   Cycle 4: Stage 1 — latch coefficients + compute u_norm + p1 = d*u
-//   Cycle 5: Stage 2 — p2 = (p1+c)*u
-//   Cycle 6: Stage 3 — p3 = (p2+b)*u
-//   Cycle 7: Output register — out = p3 + a
-//   + OUT_DELAY=28 cycles via reg_delay1  → total = 35 cycles (matches original)
+//   Cycle 4: Stage 1a — register u_norm_q115 and coeff_data
+//                       (breaks the u_cnt*recip_h → q115_mul DSP cascade)
+//   Cycle 5: Stage 1  — latch a/b/c + compute p1 = d*u
+//   Cycle 6: Stage 2  — p2 = (p1+c)*u
+//   Cycle 7: Stage 3  — p3 = (p2+b)*u
+//   Cycle 8: Stage 4  — out = p3 + a (with saturation)
+//   + OUT_DELAY=27 cycles via reg_delay1  → total = 35 cycles (matches original)
 //
 // =============================================================================
 
@@ -94,7 +96,8 @@
 
 module spline_eval #(
     parameter SEG_ADDRW    = 12,   // 12-bit address = 4096 max segments
-    parameter OUT_DELAY    = 28,   // cycles added to match 35-cycle original path
+    parameter OUT_DELAY    = 27,   // cycles added to match 35-cycle original path
+                                   // (was 28; reduced by 1 when Stage 1a was added)
     parameter MIN_H_CYCLES = 4     // minimum segment width in clock cycles
 )(
     input  wire                  clk,
@@ -233,18 +236,21 @@ function automatic signed [15:0] q115_mul(
 endfunction
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Horner pipeline — 4 registered stages
+// Horner pipeline — 4 registered stages + 1 input-register stage (Stage 1a)
 //
 // S(u) = a + u*(b + u*(c + u*d))
 //
-// u_norm is computed ONCE per output sample at stage 1 and frozen through
-// all multiply stages. Using different u values at each stage would compute
-// the wrong polynomial entirely.
+// u_norm is computed ONCE per output sample (registered in Stage 1a) and
+// frozen through all multiply stages. Using different u values at each
+// stage would compute the wrong polynomial entirely.
 //
-// Stage 1 (cycle 4 from cmdstb): latch coeff + compute u_norm + p1 = d*u
-// Stage 2 (cycle 5):             p2 = (p1 + c) * u
-// Stage 3 (cycle 6):             p3 = (p2 + b) * u
-// Stage 4 (cycle 7):             out = p3 + a
+// Stage 1a (cycle 4 from cmdstb): register u_norm_q115 and coeff_data
+//                                 (cuts the u_cnt*recip_h → q115_mul cascade
+//                                 so the two DSPs don't share a clock period)
+// Stage 1  (cycle 5):             latch a/b/c + p1 = d * u
+// Stage 2  (cycle 6):             p2 = (p1 + c) * u
+// Stage 3  (cycle 7):             p3 = (p2 + b) * u
+// Stage 4  (cycle 8):             out = p3 + a (with saturation)
 // ─────────────────────────────────────────────────────────────────────────────
 
 // Stage 1 inputs — latched coefficients and u_norm.
@@ -257,9 +263,32 @@ reg signed [15:0] s1_u=0;      // u_norm, frozen here and propagated
 reg               s1_gate=0;
 
 // u_norm = u_cnt * recip_h >> 15  (Q1.15 result, always in [0,1))
-// Use combinatorial multiply, result registered in stage 1
+// Combinational multiply; result is registered in Stage 1a below so the
+// u_cnt*recip_h DSP and the Horner d*u DSP don't share a clock period.
 wire [31:0] u_norm_wide = u_cnt * recip_h;
 wire signed [15:0] u_norm_q115 = $signed(u_norm_wide[15:0]);  // keep [0,1)
+
+// Stage 1a: register u_norm_q115 and coeff_data so DSP #1 (u_cnt*recip_h)
+// and DSP #2 (d*u in Stage 1) are separated by a flip-flop. coeff_data
+// has to be delayed in lockstep with u_norm_q115 or Stage 1 would see
+// the wrong segment's d/a/b/c for the registered u value. Adds 1 cycle
+// of latency; OUT_DELAY is reduced by 1 (28 → 27) to keep the total
+// cmdstb→envdata_out path at exactly 35 cycles.
+reg signed [15:0] u_norm_q115_reg = 0;
+reg [127:0]       coeff_data_reg  = 0;
+reg               s1a_gate        = 0;
+
+always @(posedge clk) begin
+    if (reset) begin
+        u_norm_q115_reg <= '0;
+        coeff_data_reg  <= '0;
+        s1a_gate        <= 1'b0;
+    end else begin
+        u_norm_q115_reg <= u_norm_q115;
+        coeff_data_reg  <= coeff_data;
+        s1a_gate        <= active;
+    end
+end
 
 always @(posedge clk) begin
     if (reset) begin
@@ -269,21 +298,21 @@ always @(posedge clk) begin
         s1_u <= '0;
         s1_gate <= 1'b0;
     end else begin
-        // Latch coefficients from BRAM (coeff_data is valid here — READ_LATENCY=2 done).
-        // d is intentionally NOT latched: it feeds p1 = d*u in this same stage and
-        // is never referenced again (Horner only needs a/b/c after stage 1).
-        s1_c_I  <= $signed(coeff_data[111: 96]);
-        s1_b_I  <= $signed(coeff_data[ 95: 80]);
-        s1_a_I  <= $signed(coeff_data[ 79: 64]);
-        s1_c_Q  <= $signed(coeff_data[ 47: 32]);
-        s1_b_Q  <= $signed(coeff_data[ 31: 16]);
-        s1_a_Q  <= $signed(coeff_data[ 15:  0]);
-        // First Horner multiply: p1 = d * u
-        s1_p1_I <= q115_mul($signed(coeff_data[127:112]), u_norm_q115);
-        s1_p1_Q <= q115_mul($signed(coeff_data[ 63: 48]), u_norm_q115);
+        // Latch a/b/c from the Stage 1a register. d is consumed below in
+        // p1 = d*u and never referenced again, so it doesn't get its own
+        // latch here.
+        s1_c_I  <= $signed(coeff_data_reg[111: 96]);
+        s1_b_I  <= $signed(coeff_data_reg[ 95: 80]);
+        s1_a_I  <= $signed(coeff_data_reg[ 79: 64]);
+        s1_c_Q  <= $signed(coeff_data_reg[ 47: 32]);
+        s1_b_Q  <= $signed(coeff_data_reg[ 31: 16]);
+        s1_a_Q  <= $signed(coeff_data_reg[ 15:  0]);
+        // First Horner multiply: p1 = d * u (one DSP per channel)
+        s1_p1_I <= q115_mul($signed(coeff_data_reg[127:112]), u_norm_q115_reg);
+        s1_p1_Q <= q115_mul($signed(coeff_data_reg[ 63: 48]), u_norm_q115_reg);
         // Freeze u for all downstream stages
-        s1_u    <= u_norm_q115;
-        s1_gate <= active;
+        s1_u    <= u_norm_q115_reg;
+        s1_gate <= s1a_gate;
     end
 end
 

@@ -1,4 +1,4 @@
-// Spline coefficient BRAM — 128 bits: [d_I c_I b_I a_I d_Q c_Q b_Q a_Q]
+// Spline coefficient BRAM â€” 128 bits: [d_I c_I b_I a_I d_Q c_Q b_Q a_Q]
 0000000000007FFF0000000000000000  // 0
 0000000000007FFF0000000000000000  // 1
 0000000000007FFF0000000000000000  // 2

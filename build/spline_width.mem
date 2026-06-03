@@ -1,4 +1,4 @@
-// Spline width BRAM — 32 bits: [recip_h_q115 h_cycles]
+// Spline width BRAM â€” 32 bits: [recip_h_q115 h_cycles]
 00A400C8  // 0
 00A400C8  // 1
 00A400C8  // 2

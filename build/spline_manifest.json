@@ -1,5 +1,5 @@
 {
-  "config_source": "C:\\Users\\garva\\Documents\\Research\\Siddiqui\\spline\\config\\qubitcfg.json",
+  "config_source": "/home/garv/QubiCSpline/config/qubitcfg.json",
   "delta": 0.001,
   "min_h_cycles": 4,
   "bram_depth": 4096,
@@ -88,8 +88,8 @@
         "delta": -268000000.0
       },
       "compression_ratio": 2.6041666666666665,
-      "max_err_I_lsb": 1.7349314176171902,
-      "max_err_Q_lsb": 1.019211614029146,
+      "max_err_I_lsb": 1.7349314176208281,
+      "max_err_Q_lsb": 1.0192116140290892,
       "converged": true
     },
     "Q0rabi.p0.e0.DRAG": {
@@ -104,8 +104,8 @@
         "delta": -268000000.0
       },
       "compression_ratio": 2.6041666666666665,
-      "max_err_I_lsb": 1.1447418063793293,
-      "max_err_Q_lsb": 0.9850957574583088,
+      "max_err_I_lsb": 1.1447418063795851,
+      "max_err_Q_lsb": 0.9850957574583052,
       "converged": true
     },
     "Q0read.p0.e0.cos_edge_square": {
@@ -149,8 +149,8 @@
         "delta": -268000000.0
       },
       "compression_ratio": 2.6041666666666665,
-      "max_err_I_lsb": 1.7349314176171902,
-      "max_err_Q_lsb": 1.470412741247351,
+      "max_err_I_lsb": 1.7349314176208281,
+      "max_err_Q_lsb": 1.470412741247344,
       "converged": true
     },
     "Q1rabi.p0.e0.DRAG": {
@@ -165,7 +165,7 @@
         "delta": -268000000.0
       },
       "compression_ratio": 2.6041666666666665,
-      "max_err_I_lsb": 1.5306072262928865,
+      "max_err_I_lsb": 1.5306072262906127,
       "max_err_Q_lsb": 0.9982506783013851,
       "converged": true
     },
@@ -210,8 +210,8 @@
         "delta": -268000000.0
       },
       "compression_ratio": 2.840909090909091,
-      "max_err_I_lsb": 14.309992237314873,
-      "max_err_Q_lsb": 0.9918308452767716,
+      "max_err_I_lsb": 14.309992237329425,
+      "max_err_Q_lsb": 0.9918308452767876,
       "converged": true
     },
     "Q2rabi.p0.e0.DRAG": {
@@ -226,7 +226,7 @@
         "delta": -268000000.0
       },
       "compression_ratio": 2.6041666666666665,
-      "max_err_I_lsb": 1.2790017438698555,
+      "max_err_I_lsb": 1.2790017438699124,
       "max_err_Q_lsb": 0.9186989971830988,
       "converged": true
     },
@@ -271,8 +271,8 @@
         "delta": -268000000.0
       },
       "compression_ratio": 2.840909090909091,
-      "max_err_I_lsb": 14.309992237314873,
-      "max_err_Q_lsb": 1.397450110186675,
+      "max_err_I_lsb": 14.309992237329425,
+      "max_err_Q_lsb": 1.3974501101866688,
       "converged": true
     },
     "Q3rabi.p0.e0.DRAG": {
@@ -332,7 +332,7 @@
         "delta": -268000000.0
       },
       "compression_ratio": 2.6041666666666665,
-      "max_err_I_lsb": 1.7349314176171902,
+      "max_err_I_lsb": 1.7349314176208281,
       "max_err_Q_lsb": 1.1074862173365432,
       "converged": true
     },
@@ -348,8 +348,8 @@
         "delta": -268000000.0
       },
       "compression_ratio": 2.6041666666666665,
-      "max_err_I_lsb": 0.9045048265306832,
-      "max_err_Q_lsb": 0.8001688289124829,
+      "max_err_I_lsb": 0.9045048265315927,
+      "max_err_Q_lsb": 0.80016882891249,
       "converged": true
     },
     "Q4read.p0.e0.cos_edge_square": {
@@ -393,8 +393,8 @@
         "delta": -268000000.0
       },
       "compression_ratio": 2.6041666666666665,
-      "max_err_I_lsb": 1.7349314176171902,
-      "max_err_Q_lsb": 1.2817051240895267,
+      "max_err_I_lsb": 1.7349314176208281,
+      "max_err_Q_lsb": 1.2817051240895125,
       "converged": true
     },
     "Q5rabi.p0.e0.DRAG": {
@@ -409,7 +409,7 @@
         "delta": -268000000.0
       },
       "compression_ratio": 2.6041666666666665,
-      "max_err_I_lsb": 1.1826321157259372,
+      "max_err_I_lsb": 1.1826321157277562,
       "max_err_Q_lsb": 1.5216626070810992,
       "converged": true
     },
@@ -454,8 +454,8 @@
         "delta": -268000000.0
       },
       "compression_ratio": 2.840909090909091,
-      "max_err_I_lsb": 14.309992237314873,
-      "max_err_Q_lsb": 1.0662627352294685,
+      "max_err_I_lsb": 14.309992237329425,
+      "max_err_Q_lsb": 1.0662627352294756,
       "converged": true
     },
     "Q6rabi.p0.e0.DRAG": {
@@ -470,8 +470,8 @@
         "delta": -268000000.0
       },
       "compression_ratio": 2.840909090909091,
-      "max_err_I_lsb": 4.541577256261007,
-      "max_err_Q_lsb": 0.9928219406045625,
+      "max_err_I_lsb": 4.541577256259188,
+      "max_err_Q_lsb": 0.9928219406045536,
       "converged": true
     },
     "Q6read.p0.e0.cos_edge_square": {
@@ -515,8 +515,8 @@
         "delta": -268000000.0
       },
       "compression_ratio": 2.6041666666666665,
-      "max_err_I_lsb": 1.7349314176171902,
-      "max_err_Q_lsb": 1.1091074647120536,
+      "max_err_I_lsb": 1.7349314176208281,
+      "max_err_Q_lsb": 1.1091074647120251,
       "converged": true
     },
     "Q7rabi.p0.e0.DRAG": {
@@ -531,8 +531,8 @@
         "delta": -268000000.0
       },
       "compression_ratio": 2.6041666666666665,
-      "max_err_I_lsb": 0.894774594496397,
-      "max_err_Q_lsb": 0.9913147501485279,
+      "max_err_I_lsb": 0.8947745944963827,
+      "max_err_Q_lsb": 0.9913147501485225,
       "converged": true
     },
     "Q7read.p0.e0.cos_edge_square": {

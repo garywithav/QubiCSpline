@@ -1,0 +1,45 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+-----------------------------------------------------------------------------------------
+| Tool Version      : Vivado v.2022.2 (lin64) Build 3671981 Fri Oct 14 04:59:54 MDT 2022
+| Date              : Wed May 27 11:48:03 2026
+| Host              : 71-176A running 64-bit Ubuntu 24.04.4 LTS
+| Command           : report_clocks -file vivado_reports/clocks.rpt
+| Design            : spline_eval
+| Device            : xczu48dr-ffvg1517
+| Speed File        : -2  PRODUCTION 1.32 01-31-2021
+| Temperature Grade : E
+-----------------------------------------------------------------------------------------
+
+Clock Report
+
+
+Attributes
+  P: Propagated
+  G: Generated
+  A: Auto-derived
+  R: Renamed
+  V: Virtual
+  I: Inverted
+  S: Pin phase-shifted with Latency mode
+
+Clock    Period(ns)  Waveform(ns)   Attributes  Sources
+sys_clk  4.000       {0.000 2.000}  P           {clk}
+
+
+====================================================
+Generated Clocks
+====================================================
+
+
+
+====================================================
+User Uncertainty
+====================================================
+
+
+
+====================================================
+User Jitter
+====================================================
+
+

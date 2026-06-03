@@ -1,0 +1,13 @@
+#-----------------------------------------------------------
+# Vivado v2022.2 (64-bit)
+# SW Build 3671981 on Fri Oct 14 04:59:54 MDT 2022
+# IP Build 3669848 on Fri Oct 14 08:30:02 MDT 2022
+# Start of session at: Wed May 27 11:46:58 2026
+# Process ID: 55453
+# Current directory: /home/garv/QubiCSpline
+# Command line: vivado -mode batch -source scripts/synth_check.tcl
+# Log file: /home/garv/QubiCSpline/vivado.log
+# Journal file: /home/garv/QubiCSpline/vivado.jou
+# Running On: 71-176A, OS: Linux, CPU Frequency: 5658.087 MHz, CPU Physical cores: 24, Host memory: 134816 MB
+#-----------------------------------------------------------
+source scripts/synth_check.tcl
